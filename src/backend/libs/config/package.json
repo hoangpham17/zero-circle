@@ -1,0 +1,11 @@
+{
+  "name": "@app/config",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "peerDependencies": {
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.0.0",
+    "joi": "^17.9.2"
+  }
+}

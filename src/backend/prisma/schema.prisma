@@ -1,0 +1,164 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  avatar        String?
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  isActive      Boolean   @default(true)
+  role          Role      @default(USER)
+  
+  // Relations
+  meditationSessions MeditationSession[]
+  favorites          Favorite[]
+  progress           Progress[]
+  settings           UserSettings?
+  
+  @@map("users")
+}
+
+// User settings
+model UserSettings {
+  id                String   @id @default(uuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme             String   @default("light")
+  notificationsEnabled Boolean @default(true)
+  reminderTime      DateTime?
+  language          String   @default("en")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("user_settings")
+}
+
+// Meditation session model
+model MeditationSession {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  duration    Int      // in seconds
+  startTime   DateTime
+  endTime     DateTime?
+  completed   Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("meditation_sessions")
+}
+
+// Meditation content model
+model MeditationContent {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  audioUrl    String
+  duration    Int      // in seconds
+  level       Level    @default(BEGINNER)
+  category    String
+  teacher     String?
+  isPublic    Boolean  @default(true)
+  isPremium   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  favorites   Favorite[]
+  progress    Progress[]
+  
+  @@map("meditation_contents")
+}
+
+// Buddhist content model
+model BuddhistContent {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  contentType ContentType
+  content     String?  // For text content
+  audioUrl    String?  // For audio content
+  videoUrl    String?  // For video content
+  author      String?
+  source      String?
+  isPublic    Boolean  @default(true)
+  isPremium   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  favorites   Favorite[]
+  progress    Progress[]
+  
+  @@map("buddhist_contents")
+}
+
+// Favorite model
+model Favorite {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meditationContentId String?
+  meditationContent   MeditationContent? @relation(fields: [meditationContentId], references: [id], onDelete: SetNull)
+  buddhistContentId   String?
+  buddhistContent     BuddhistContent? @relation(fields: [buddhistContentId], references: [id], onDelete: SetNull)
+  createdAt           DateTime @default(now())
+  
+  @@unique([userId, meditationContentId])
+  @@unique([userId, buddhistContentId])
+  @@map("favorites")
+}
+
+// Progress model
+model Progress {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meditationContentId String?
+  meditationContent   MeditationContent? @relation(fields: [meditationContentId], references: [id], onDelete: SetNull)
+  buddhistContentId   String?
+  buddhistContent     BuddhistContent? @relation(fields: [buddhistContentId], references: [id], onDelete: SetNull)
+  progress            Float    @default(0) // 0-100%
+  lastPosition        Int      @default(0) // in seconds for audio/video
+  completed           Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  
+  @@unique([userId, meditationContentId])
+  @@unique([userId, buddhistContentId])
+  @@map("progress")
+}
+
+// Enums
+enum Role {
+  USER
+  TEACHER
+  ADMIN
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum ContentType {
+  TEXT
+  AUDIO
+  VIDEO
+}
