@@ -28,6 +28,10 @@ model User {
   favorites          Favorite[]
   progress           Progress[]
   settings           UserSettings?
+  soundResources     SoundResource[]
+  imageResources     ImageResource[]
+  meditationConfigs  MeditationConfig[]
+  achievements       UserAchievement[]
   
   @@map("users")
 }
@@ -49,18 +53,109 @@ model UserSettings {
 
 // Meditation session model
 model MeditationSession {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  duration          Int      // in seconds
+  startTime         DateTime
+  endTime           DateTime?
+  completed         Boolean  @default(false)
+  notes             String?
+  
+  // New fields for Sprint 1
+  backgroundImageId String?
+  backgroundImage   ImageResource? @relation("SessionBackground", fields: [backgroundImageId], references: [id], onDelete: SetNull)
+  startSoundId      String?
+  startSound        SoundResource? @relation("SessionStartSound", fields: [startSoundId], references: [id], onDelete: SetNull)
+  endSoundId        String?
+  endSound          SoundResource? @relation("SessionEndSound", fields: [endSoundId], references: [id], onDelete: SetNull)
+  
+  // Periodic chime settings
+  periodicChimeEnabled Boolean @default(false)
+  periodicChimeInterval Int?    // in seconds
+  periodicChimeSoundId String?
+  periodicChimeSound   SoundResource? @relation("SessionPeriodicSound", fields: [periodicChimeSoundId], references: [id], onDelete: SetNull)
+  
+  // Configuration reference
+  configId          String?
+  config            MeditationConfig? @relation(fields: [configId], references: [id], onDelete: SetNull)
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("meditation_sessions")
+}
+
+// Meditation configuration model
+model MeditationConfig {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String
+  isDefault         Boolean  @default(false)
+  
+  // Configuration settings
+  backgroundImageId String?
+  backgroundImage   ImageResource? @relation(fields: [backgroundImageId], references: [id], onDelete: SetNull)
+  startSoundId      String?
+  startSound        SoundResource? @relation(fields: [startSoundId], references: [id], onDelete: SetNull)
+  endSoundId        String?
+  endSound          SoundResource? @relation(fields: [endSoundId], references: [id], onDelete: SetNull)
+  
+  // Periodic chime settings
+  periodicChimeEnabled Boolean @default(false)
+  periodicChimeInterval Int?    // in seconds
+  periodicChimeSoundId String?
+  periodicChimeSound   SoundResource? @relation(fields: [periodicChimeSoundId], references: [id], onDelete: SetNull)
+  
+  // Sessions using this config
+  sessions          MeditationSession[]
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("meditation_configs")
+}
+
+// Sound resource model
+model SoundResource {
   id          String   @id @default(uuid())
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  duration    Int      // in seconds
-  startTime   DateTime
-  endTime     DateTime?
-  completed   Boolean  @default(false)
-  notes       String?
+  name        String
+  url         String
+  duration    Int?     // in seconds
+  isSystem    Boolean  @default(false)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
-  @@map("meditation_sessions")
+  // Relations
+  sessionStartSounds      MeditationSession[] @relation("SessionStartSound")
+  sessionEndSounds        MeditationSession[] @relation("SessionEndSound")
+  sessionPeriodicSounds   MeditationSession[] @relation("SessionPeriodicSound")
+  configStartSounds       MeditationConfig[] @relation("ConfigStartSound")
+  configEndSounds         MeditationConfig[] @relation("ConfigEndSound")
+  configPeriodicSounds    MeditationConfig[] @relation("ConfigPeriodicSound")
+  
+  @@map("sound_resources")
+}
+
+// Image resource model
+model ImageResource {
+  id          String   @id @default(uuid())
+  name        String
+  url         String
+  isSystem    Boolean  @default(false)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  sessionBackgrounds      MeditationSession[] @relation("SessionBackground")
+  configBackgrounds       MeditationConfig[] @relation("ConfigBackground")
+  
+  @@map("image_resources")
 }
 
 // Meditation content model
@@ -144,9 +239,40 @@ model Progress {
   @@map("progress")
 }
 
+// Achievement model
+model Achievement {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String
+  iconUrl     String
+  type        AchievementType
+  threshold   Int      // Value needed to earn achievement
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  userAchievements UserAchievement[]
+  
+  @@map("achievements")
+}
+
+// User Achievement model
+model UserAchievement {
+  id            String     @id @default(uuid())
+  userId        String
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  earnedAt      DateTime   @default(now())
+  
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
 // Enums
 enum Role {
   USER
+  CONTENT_MANAGER
   TEACHER
   ADMIN
 }
@@ -161,4 +287,11 @@ enum ContentType {
   TEXT
   AUDIO
   VIDEO
+}
+
+enum AchievementType {
+  TOTAL_SESSIONS
+  TOTAL_MINUTES
+  STREAK_DAYS
+  CONSECUTIVE_DAYS
 }

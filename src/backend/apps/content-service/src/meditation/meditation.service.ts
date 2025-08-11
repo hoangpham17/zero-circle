@@ -114,7 +114,18 @@ export class MeditationService {
         startTime: 'desc',
       },
       include: {
-        content: true,
+        backgroundImage: true,
+        startSound: true,
+        endSound: true,
+        periodicChimeSound: true,
+        config: {
+          include: {
+            backgroundImage: true,
+            startSound: true,
+            endSound: true,
+            periodicChimeSound: true,
+          },
+        },
       },
     });
   }
@@ -123,7 +134,18 @@ export class MeditationService {
     const session = await this.prisma.meditationSession.findUnique({
       where: { id },
       include: {
-        content: true,
+        backgroundImage: true,
+        startSound: true,
+        endSound: true,
+        periodicChimeSound: true,
+        config: {
+          include: {
+            backgroundImage: true,
+            startSound: true,
+            endSound: true,
+            periodicChimeSound: true,
+          },
+        },
       },
     });
 
@@ -135,10 +157,50 @@ export class MeditationService {
   }
 
   async createSession(createDto: CreateMeditationSessionDto) {
+    // If configId is provided, apply the config settings
+    if (createDto.configId) {
+      const config = await this.prisma.meditationConfig.findUnique({
+        where: { id: createDto.configId },
+      });
+      
+      if (config) {
+        // Apply config settings if not explicitly provided in the DTO
+        if (!createDto.backgroundImageId) {
+          createDto.backgroundImageId = config.backgroundImageId;
+        }
+        if (!createDto.startSoundId) {
+          createDto.startSoundId = config.startSoundId;
+        }
+        if (!createDto.endSoundId) {
+          createDto.endSoundId = config.endSoundId;
+        }
+        if (createDto.periodicChimeEnabled === undefined) {
+          createDto.periodicChimeEnabled = config.periodicChimeEnabled;
+        }
+        if (!createDto.periodicChimeInterval && config.periodicChimeEnabled) {
+          createDto.periodicChimeInterval = config.periodicChimeInterval;
+        }
+        if (!createDto.periodicChimeSoundId && config.periodicChimeEnabled) {
+          createDto.periodicChimeSoundId = config.periodicChimeSoundId;
+        }
+      }
+    }
+    
     return this.prisma.meditationSession.create({
       data: createDto,
       include: {
-        content: true,
+        backgroundImage: true,
+        startSound: true,
+        endSound: true,
+        periodicChimeSound: true,
+        config: {
+          include: {
+            backgroundImage: true,
+            startSound: true,
+            endSound: true,
+            periodicChimeSound: true,
+          },
+        },
       },
     });
   }
@@ -149,7 +211,18 @@ export class MeditationService {
         where: { id },
         data: updateDto,
         include: {
-          content: true,
+          backgroundImage: true,
+          startSound: true,
+          endSound: true,
+          periodicChimeSound: true,
+          config: {
+            include: {
+              backgroundImage: true,
+              startSound: true,
+              endSound: true,
+              periodicChimeSound: true,
+            },
+          },
         },
       });
     } catch (error) {

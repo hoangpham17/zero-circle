@@ -26,6 +26,41 @@ export class CreateMeditationSessionDto {
   @IsString()
   @IsOptional()
   notes?: string;
+  
+  @ApiPropertyOptional({ description: 'Background image ID' })
+  @IsUUID()
+  @IsOptional()
+  backgroundImageId?: string;
+  
+  @ApiPropertyOptional({ description: 'Start sound ID' })
+  @IsUUID()
+  @IsOptional()
+  startSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'End sound ID' })
+  @IsUUID()
+  @IsOptional()
+  endSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'Enable periodic chimes', default: false })
+  @IsBoolean()
+  @IsOptional()
+  periodicChimeEnabled?: boolean;
+  
+  @ApiPropertyOptional({ description: 'Periodic chime interval in seconds' })
+  @IsNumber()
+  @IsOptional()
+  periodicChimeInterval?: number;
+  
+  @ApiPropertyOptional({ description: 'Periodic chime sound ID' })
+  @IsUUID()
+  @IsOptional()
+  periodicChimeSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'Meditation configuration ID' })
+  @IsUUID()
+  @IsOptional()
+  configId?: string;
 }
 
 export class UpdateMeditationSessionDto {
@@ -49,6 +84,41 @@ export class UpdateMeditationSessionDto {
   @IsString()
   @IsOptional()
   notes?: string;
+  
+  @ApiPropertyOptional({ description: 'Background image ID' })
+  @IsUUID()
+  @IsOptional()
+  backgroundImageId?: string;
+  
+  @ApiPropertyOptional({ description: 'Start sound ID' })
+  @IsUUID()
+  @IsOptional()
+  startSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'End sound ID' })
+  @IsUUID()
+  @IsOptional()
+  endSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'Enable periodic chimes' })
+  @IsBoolean()
+  @IsOptional()
+  periodicChimeEnabled?: boolean;
+  
+  @ApiPropertyOptional({ description: 'Periodic chime interval in seconds' })
+  @IsNumber()
+  @IsOptional()
+  periodicChimeInterval?: number;
+  
+  @ApiPropertyOptional({ description: 'Periodic chime sound ID' })
+  @IsUUID()
+  @IsOptional()
+  periodicChimeSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'Meditation configuration ID' })
+  @IsUUID()
+  @IsOptional()
+  configId?: string;
 }
 
 export class CreateMeditationContentDto {
@@ -164,6 +234,42 @@ export class MeditationSessionResponseDto {
 
   @ApiPropertyOptional({ description: 'Meditation session notes' })
   notes?: string;
+  
+  @ApiPropertyOptional({ description: 'Background image ID' })
+  backgroundImageId?: string;
+  
+  @ApiPropertyOptional({ description: 'Background image details' })
+  backgroundImage?: any; // Will be populated with ImageResourceResponseDto
+  
+  @ApiPropertyOptional({ description: 'Start sound ID' })
+  startSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'Start sound details' })
+  startSound?: any; // Will be populated with SoundResourceResponseDto
+  
+  @ApiPropertyOptional({ description: 'End sound ID' })
+  endSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'End sound details' })
+  endSound?: any; // Will be populated with SoundResourceResponseDto
+  
+  @ApiProperty({ description: 'Enable periodic chimes' })
+  periodicChimeEnabled: boolean;
+  
+  @ApiPropertyOptional({ description: 'Periodic chime interval in seconds' })
+  periodicChimeInterval?: number;
+  
+  @ApiPropertyOptional({ description: 'Periodic chime sound ID' })
+  periodicChimeSoundId?: string;
+  
+  @ApiPropertyOptional({ description: 'Periodic chime sound details' })
+  periodicChimeSound?: any; // Will be populated with SoundResourceResponseDto
+  
+  @ApiPropertyOptional({ description: 'Meditation configuration ID' })
+  configId?: string;
+  
+  @ApiPropertyOptional({ description: 'Meditation configuration details' })
+  config?: any; // Will be populated with MeditationConfigResponseDto
 
   @ApiProperty({ description: 'Creation date' })
   createdAt: Date;

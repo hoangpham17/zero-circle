@@ -8,6 +8,25 @@ export interface IMeditationSession {
   endTime?: Date;
   completed: boolean;
   notes?: string;
+  
+  // New fields for Sprint 1
+  backgroundImageId?: string;
+  backgroundImage?: any; // IImageResource
+  
+  startSoundId?: string;
+  startSound?: any; // ISoundResource
+  
+  endSoundId?: string;
+  endSound?: any; // ISoundResource
+  
+  periodicChimeEnabled: boolean;
+  periodicChimeInterval?: number;
+  periodicChimeSoundId?: string;
+  periodicChimeSound?: any; // ISoundResource
+  
+  configId?: string;
+  config?: any; // IMeditationConfig
+  
   createdAt: Date;
   updatedAt: Date;
 }

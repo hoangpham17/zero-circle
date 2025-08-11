@@ -4,8 +4,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "peerDependencies": {
-    "@nestjs/common": "^10.0.0",
-    "@nestjs/config": "^3.0.0",
+    "@nestjs/common": "^11.0.0",
+    "@nestjs/config": "^4.0.0",
     "joi": "^17.9.2"
   }
 }

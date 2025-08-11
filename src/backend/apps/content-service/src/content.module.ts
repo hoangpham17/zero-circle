@@ -5,6 +5,8 @@ import { ContentController } from './content.controller';
 import { ContentService } from './content.service';
 import { MeditationModule } from './meditation/meditation.module';
 import { BuddhistContentModule } from './buddhist-content/buddhist-content.module';
+import { ResourceModule } from './resource/resource.module';
+import { MeditationConfigModule } from './meditation-config/meditation-config.module';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { BuddhistContentModule } from './buddhist-content/buddhist-content.modul
     DatabaseModule,
     MeditationModule,
     BuddhistContentModule,
+    ResourceModule,
+    MeditationConfigModule,
   ],
   controllers: [ContentController],
   providers: [ContentService],
